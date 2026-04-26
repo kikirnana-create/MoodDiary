@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Diary - Gallery 💖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            transition: all 0.5s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Mood Background Colors */
+        .mood-happy { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%) !important; }
+        .mood-sad { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important; }
+        .mood-angry { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important; }
+        .mood-calm { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%) !important; }
+        .mood-excited { background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%) !important; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header dengan Back Button */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30px 0;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Add Diary Form */
+        .add-diary {
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .add-diary h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2d3436;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3436;
+            font-size: 1.1rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 18px;
+            border: 3px solid #e1e8ed;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #a29bfe;
+            box-shadow: 0 0 0 4px rgba(162, 155, 254, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .add-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 40px rgba(255,107,107,0.4);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(255,107,107,0.6);
+        }
+
+        .add-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Gallery Grid */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .diary-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .diary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .diary-card:hover {
+            transform: translateY(-20px) scale(1.02);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+        }
+
+        .diary-card.happy::before { 
+            background: linear-gradient(90deg, #ffecd2, #fcb69f); 
+        }
+        .diary-card.sad::before { 
+            background: linear-gradient(90deg, #a8edea, #fed6e3); 
+        }
+        .diary-card.angry::before { 
+            background: linear-gradient(90deg, #ff9a9e, #fecfef); 
+        }
+        .diary-card.calm::before { 
+            background: linear-gradient(90deg, #a1c4fd, #c2e9fb); 
+        }
+        .diary-card.excited::before { 
+            background: linear-gradient(90deg, #ffeaa7, #fab1a0); 
+        }
+
+        .mood-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .mood-happy .mood-icon { color: #fdcb6e; }
+        .mood-sad .mood-icon { color: #74b9ff; }
+        .mood-angry .mood-icon { color: #e17055; }
+        .mood-calm .mood-icon { color: #00b894; }
+        .mood-excited .mood-icon { color: #fd79a8; }
+
+        .diary-date {
+            color: #636e72;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            background: rgba(162, 155, 254, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .diary-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 18px;
+            color: #2d3436;
+            line-height: 1.3;
+        }
+
+        .diary-content {
+            color: #636e72;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .diary-reason {
+            background: rgba(255,255,255,0.7);
+            border-left: 4px solid #a29bfe;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 15px 15px 0;
+            font-style: italic;
+            color: #4b6587;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: white;
+            background: rgba(255,255,255,0.1);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .empty-emoji {
+            font-size: 6rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .empty-text {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            border-radius: 15px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #00b894, #00a187);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #e17055, #d63031);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 1000;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header dengan Back Button -->
+        <header class="header">
+            <button onclick="window.location.href='index.html'" class="back-btn">
+                ← Kembali ke Home
+            </button>
+            <h1 class="logo">💖 MoodDiary</h1>
+        </header>
+
+        <h2 class="page-title">📸 Mood Gallery</h2>
+
+        <!-- Add Diary Form -->
+        <div class="add-diary">
+            <h2>📝 Tambah Diary Baru</h2>
+            <form id="diaryForm">
+                <div class="form-group">
+                    <label>🎯 Judul Diary</label>
+                    <input type="text" id="diaryTitle" placeholder="Contoh: Hari yang luar biasa!" required>
+                </div>
+                <div class="form-group">
+                    <label>😊 Mood Hari Ini</label>
+                    <select id="diaryMood" required>
+                        <option value="">Pilih mood kamu</option>
+                        <option value="happy">😊 Senang</option>
+                        <option value="sad">😢 Sedih</option>
+                        <option value="angry">😣 Marah</option>
+                        <option value="calm">😌 Tenang</option>
+                        <option value="excited">🎉 Excited</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>✍️ Catatan Harian</label>
+                    <textarea id="diaryContent" rows="4" placeholder="Apa yang terjadi hari ini? Ceritakan semua..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>💭 Alasan Mood</label>
+                    <textarea id="diaryReason" rows="3" placeholder="Kenapa kamu merasa seperti ini hari ini?"></textarea>
+                </div>
+                <button type="submit" class="add-btn" id="submitBtn">💾 Simpan ke Gallery</button>
+            </form>
+        </div>
+
+        <!-- HASIL DIARY MUNCUL DI SINI -->
+        <div id="galleryContainer" class="gallery"></div>
+    </div>
+
+    <!-- FIREBASE CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+            import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase (tetap sama seperti yang diminta)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2-yZbNDks0aD4Pwv-YGQHqay4Z8NKZ24",
+            authDomain: "web-mooddiary.firebaseapp.com",
+            databaseURL: "https://web-mooddiary-default-rtdb.firebaseio.com",
+            projectId: "web-mooddiary",
+            storageBucket: "web-mooddiary.firebasestorage.app",
+            messagingSenderId: "176986742289",
+            appId: "1:176986742289:web:243a91f4e370f4825f5bb0",
+            measurementId: "G-QB2M67DYGJ"
+        };        
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Fungsi untuk menampilkan loading
+        function showLoading() {
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            spinner.id = 'loadingSpinner';
+            document.body.appendChild(spinner);
+        }
+
+        function hideLoading() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.remove();
+        }
+
+        // SIMPAN DATA KE FIREBASE
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('diaryForm');
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Ambil nilai dari form
+            const title = document.getElementById('diaryTitle').value.trim();
+            const mood = document.getElementById('diaryMood').value;
+            const content = document.getElementById('diaryContent').value.trim();
+            const reason = document.getElementById('diaryReason').value.trim();
+
+            // Validasi form
+            if (!title) {
+                showNotification('Judul diary harus diisi!', 'error');
+                return;
+            }
+            if (!mood) {
+                showNotification('Pilih mood kamu terlebih dahulu!', 'error');
+                return;
+            }
+            if (!content) {
+                showNotification('Catatan harian tidak boleh kosong!', 'error');
+                return;
+            }
+
+            // Disable button sambil proses
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Menyimpan...';
+            showLoading();
+
+            try {
+                // Simpan ke Firestore
+                const docRef = await addDoc(collection(db, "diary"), {
+                    title: title,
+                    mood: mood,
+                    content: content,
+                    reason: reason,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+
+                console.log("Data berhasil disimpan dengan ID: ", docRef.id);
+                showNotification("✨ Diary berhasil disimpan! ✨", 'success');
+                
+                // Reset form
+                form.reset();
+                
+                // Reload data dari Firebase
+                await loadData();
+
+            } catch (err) {
+                console.error("Error saat menyimpan:", err);
+                showNotification("Gagal menyimpan diary. Coba lagi ya! 😔", 'error');
+            } finally {
+                // Enable button kembali
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💾 Simpan ke Gallery';
+                hideLoading();
+            }
+        });
+
+        // Fungsi untuk memformat date dengan lebih baik
+        function formatDate(timestamp) {
+            if (!timestamp || !timestamp.toDate) return "Baru saja";
+            
+            const date = timestamp.toDate();
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) {
+                return `Hari ini, ${date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
+            } else if (diffDays === 1) {
+                return `Kemarin, ${date.toLocaleDateString('id-ID')}`;
+            } else {
+                return date.toLocaleDateString('id-ID', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            }
+        }
+
+        // Fungsi untuk get emoji berdasarkan mood
+        function getMoodEmoji(mood) {
+            const emojis = {
+                "happy": "😊",
+                "sad": "😢",
+                "angry": "😣",
+                "calm": "😌",
+                "excited": "🎉"
+            };
+            return emojis[mood] || "😊";
+        }
+
+        // Fungsi untuk get label mood
+        function getMoodLabel(mood) {
+            const labels = {
+                "happy": "Senang",
+                "sad": "Sedih",
+                "angry": "Marah",
+                "calm": "Tenang",
+                "excited": "Excited"
+            };
+            return labels[mood] || "Senang";
+        }
+
+        // LOAD DATA DARI FIREBASE
+        async function loadData() {
+            const gallery = document.getElementById('galleryContainer');
+            
+            // Tampilkan loading di gallery
+            gallery.innerHTML = '<div class="empty-state"><div class="empty-emoji">⏳</div><div class="empty-text">Memuat data...</div></div>';
+            
+            try {
+                // Query dengan sorting berdasarkan waktu terbaru
+                const q = query(collection(db, "diary"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    gallery.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-emoji">📔</div>
+                            <div class="empty-text">Belum ada diary nih...</div>
+                            <div class="empty-text" style="font-size: 1rem">Yuk buat diary pertama kamu! ✨</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Kosongkan gallery
+                gallery.innerHTML = "";
+
+                // Loop untuk menampilkan setiap diary
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    // Buat card element
+                    const card = document.createElement("div");
+                    card.className = `diary-card ${data.mood || 'calm'}`;
+                    
+                    // Format konten dengan batasan panjang
+                    const contentPreview = data.content.length > 200 ? 
+                        data.content.substring(0, 200) + '...' : 
+                        data.content;
+                    
+                    // Buat inner HTML card
+                    card.innerHTML = `
+                        <div class="mood-icon">${getMoodEmoji(data.mood)}</div>
+                        <div class="diary-date">📅 ${formatDate(data.createdAt)}</div>
+                        <div class="diary-title">${escapeHtml(data.title)}</div>
+                        <div class="diary-content">
+                            <strong>Mood:</strong> ${getMoodLabel(data.mood)} ${getMoodEmoji(data.mood)}<br><br>
+                            ${escapeHtml(contentPreview)}
+                        </div>
+                        ${data.reason ? `<div class="diary-reason">💭 ${escapeHtml(data.reason)}</div>` : ""}
+                    `;
+                    
+                    // Tambahkan efek klik untuk melihat detail lengkap
+                    card.addEventListener('click', () => {
+                        showDetailModal(data);
+                    });
+                    
+                    gallery.appendChild(card);
+                });
+                
+                console.log("Data berhasil dimuat, total:", querySnapshot.size);
+                
+            } catch (err) {
+                console.error("Error saat memuat data:", err);
+                gallery.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-emoji">⚠️</div>
+                        <div class="empty-text">Gagal memuat data</div>
+                        <button onclick="location.reload()" class="back-btn" style="margin-top: 20px">🔄 Coba Lagi</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Fungsi untuk menghindari XSS
+        function escapeHtml(text) {
+            if (!text) return "";
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Modal untuk detail lengkap
+        function showDetailModal(data) {
+            // Buat modal element
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+                padding: 20px;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                border-radius: 30px;
+                padding: 40px;
+                max-width: 600px;
+                width: 100%;
+                max-height: 80vh;
+                overflow-y: auto;
+                position: relative;
+                animation: slideUp 0.3s ease;
+            `;
+            
+            modalContent.innerHTML = `
+                <button onclick="this.closest('div').remove()" style="
+                    position: sticky;
+                    top: 0;
+                    float: right;
+                    background: #ff6b6b;
+                    color: white;
+                    border: none;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    font-size: 24px;
+                    cursor: pointer;
+                    margin-bottom: 20px;
+                ">×</button>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 4rem;">${getMoodEmoji(data.mood)}</div>
+                    <div style="font-size: 1.2rem; color: #636e72; margin-top: 10px;">${formatDate(data.createdAt)}</div>
+                </div>
+                <h2 style="font-size: 2rem; color: #2d3436; margin-bottom: 20px;">${escapeHtml(data.title)}</h2>
+                <div style="margin-bottom: 20px;">
+                    <strong style="color: #a29bfe;">Mood:</strong> ${getMoodLabel(data.mood)} ${getMoodEmoji(data.mood)}
+                </div>
+                <div style="margin-bottom: 20px; line-height: 1.8;">
+                    <strong style="color: #a29bfe;">Cerita:</strong><br>
+                    ${escapeHtml(data.content)}
+                </div>
+                ${data.reason ? `
+                <div style="background: rgba(162,155,254,0.1); padding: 20px; border-radius: 20px; margin-top: 20px;">
+                    <strong style="color: #a29bfe;">💭 Alasan Mood:</strong><br>
+                    ${escapeHtml(data.reason)}
+                </div>
+                ` : ''}
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Close modal ketika klik di luar
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        // Load data saat halaman pertama kali dibuka
+        console.log("Memulai load data...");
+        loadData();
+        
+        // Optional: Auto refresh setiap 30 detik
+        setInterval(() => {
+            console.log("Auto refresh data...");
+            loadData();
+        }, 30000);
+    </script>
+    
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</body>
+</html>
